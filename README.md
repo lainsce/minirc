@@ -1,4 +1,4 @@
-#![icon](data/rc-car-icon.png) rc-car - minimalistic rc script (fork of minirc)
+[](data/rc-car-icon.png) # rc-car - minimalistic rc script (fork of minirc)
 
 ![screenshot](screenshot.png)
 
