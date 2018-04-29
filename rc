@@ -3,9 +3,9 @@
 # the user to start/stop daemons.
 
 # Fallback Configuration Values, to be able to run even with a broken, deleted
-# or outdated minirc.conf:
-DAEMONS="syslog-ng iptables avahi-daemon alsa crond dbus wpa_supplicant dhcpcd sshd privoxy polipo acpid mpd vsftpd NetworkManager lighttpd ntpd haveged"
-ENABLED="@syslog-ng @crond"
+# or outdated rccar.conf:
+DAEMONS="NetworkManager acpid alsa avahi-daemon crond cupsd dbus dhcpcd haveged iptables lighttpd mpd ntpd polipo privoxy sshd syslog-ng vsftpd wpa_supplicant"
+ENABLED="@syslog-ng @crond @dbus"
 UDEV="busybox"
 NETWORK_INTERFACE="eth0"
 WIFI_INTERFACE="wlan0"
@@ -18,7 +18,7 @@ custom_start()   { default_start   "$@"; }
 custom_stop()	{ default_stop	"$@"; }
 custom_poll()	{ default_poll	"$@"; }
 
-. /etc/minirc.conf
+. /etc/rccar.conf
 
 on_boot() {
 	#===================
@@ -66,8 +66,6 @@ on_boot() {
 	echo_color 3 fscking...
 	fsck -A -T -C -a
 
-	#===================
-	# start the default daemons
 	echo_color 3 starting daemons...
 	for dmn in $ENABLED; do
 		if [ "$(echo "$dmn" | awk '{ s=substr($0, 1, 1); print s; }')" = '@' ]; then
@@ -76,13 +74,6 @@ on_boot() {
 			custom_start "$dmn"
 		fi
 	done
-	
-	#===================
-	# load /etc/minirc.local
-	if [ -x /etc/minirc.local ]; then
-		echo_color 3 loading /etc/minirc.local...
-		/etc/minirc.local
-	fi
 }
 
 on_shutdown() {
@@ -90,13 +81,6 @@ on_shutdown() {
 	# stop the default daemons
 	echo_color 3 stopping daemons...
 	custom_stop all
-
-	#===================
-	# load minirc.local.shutdown
-	if [ -x /etc/minirc.local.shutdown ]; then
-		echo_color 3 loading /etc/minirc.local.shutdown...
-		/etc/minirc.local.shutdown
-	fi
 
 	#===================
 	# shut down udev
@@ -122,6 +106,8 @@ default_start() {
 		done;;
 	alsa)
 		alsactl restore;;
+        cupsd)
+		cupsd;;
 	avahi-daemon)
 		avahi-daemon &> /dev/null &;;
 	bitlbee)
@@ -176,6 +162,8 @@ default_stop() {
 		done;;
 	alsa)
 		alsactl store;;
+        cupsd)
+		killall cupsd;;
 	avahi-daemon)
 		avahi-daemon -k;;
 	dbus)
@@ -197,7 +185,7 @@ default_stop() {
 default_restart() {
 	case "$1" in
 	sshd)
-		# Make sure minirc doesn't hang up when restarting it remotely
+		# Make sure rc-car doesn't hang up when restarting it remotely
 		busybox setsid sh -c '"$0" stop "$@"; "$0" start "$@"' "$0" "$@";;
 	*)
 		custom_stop "$@"
@@ -249,7 +237,7 @@ start|stop|restart)
 		fi
 	done;;
 --version)
-	echo minirc 0.2;;
+	echo rc-car 1.0;;
 *)
 	self=$(basename "$0")
 	echo "Usage: $self [--help] [--version] <action> [list of daemons]"

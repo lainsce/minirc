@@ -1,9 +1,5 @@
-# This is an example /etc/inittab file for "busybox init" which starts
-# minirc on boot, creates TTY's and handles the killing of services on
-# shutdown.
-#
-# NOTE: you have to replace /sbin/rc in this file with whatever path
-# you placed the rc-script at.
+# This is an example /etc/inittab file for "busybox init" for use with rc-car
+# NOTE: you have to replace /sbin/rc in this file with whatever path you placed the rc-script at.
 
 # Start "rc init" on boot
 ::sysinit:/sbin/rc init
