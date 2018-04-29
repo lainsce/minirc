@@ -10,6 +10,7 @@ UDEV="busybox"
 NETWORK_INTERFACE="eth0"
 WIFI_INTERFACE="wlan0"
 HOSTNAME="$(cat /etc/hostname)"
+KEYMAP=us
 
 # User-definable start/stop/restart/poll functions which fall back to defaults
 custom_restart() { default_restart "$@"; }
@@ -53,10 +54,17 @@ on_boot() {
 
 	echo_color 3 setting hostname...
 	echo "$HOSTNAME" >| /proc/sys/kernel/hostname
+        
+	echo_color 3 setting keymap...
+	loadkeys $KEYMAP
 
 	echo_color 3 mounting...
 	mount -a
 	mount -o remount,rw /
+	swapon -a
+
+	echo_color 3 fscking...
+	fsck -A -T -C -a
 
 	#===================
 	# start the default daemons
