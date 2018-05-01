@@ -12,10 +12,11 @@ WIFI_INTERFACE="wlan0"
 HOSTNAME="$(cat /etc/hostname)"
 KEYMAP=us
 
+# Read system config
 . /etc/rccar.conf
 
 on_boot() {
-	echo_color 4 RC-Car 1.0 booting up $(cat /etc/issue | head -n +1 | awk '{print $1}') [$(uname -r)]
+	echo_color 4 RC-Car 1.0 booting up $(cat /etc/issue | head -n +1 | awk '{print $1}') [$(uname -rms)]
 
 	# mount the API filesystem
 	echo_color 3 :: mounting API filesystem...
@@ -52,8 +53,8 @@ on_boot() {
 	loadkeys $KEYMAP
 
 	echo_color 3 :: mounting...
-	mount -a
 	mount -o remount,rw /
+	mount -a
 	swapon -a
 
 	echo_color 3 :: running fsck on partitions...
@@ -141,7 +142,7 @@ default_start() {
 			default_poll "${dmn##@}" || default_start "${dmn##@}"
 		done;;
 	alsa)
-		alsactl restore;;
+		alsactl --file /var/run/alsa/asound.state restore;;
         cupsd)
 		cupsd;;
 	avahi-daemon)
@@ -164,7 +165,7 @@ default_start() {
 		su -c 'polipo daemonise=true logFile="/var/log/polipo.log"' -s /bin/sh - nobody;;
 	dhcpcd)
 		if ip link | grep -Fq $NETWORK_INTERFACE; then :; else
-			echo_color 3 "waiting for $NETWORK_INTERFACE to settle..."
+			echo_color 3 ":: waiting for $NETWORK_INTERFACE to settle..."
 			for i in $(seq 100); do
 				ip link | grep -Fq $NETWORK_INTERFACE && break
 				sleep 1
@@ -197,7 +198,7 @@ default_stop() {
 			default_poll "${dmn##@}" && default_stop "${dmn##@}"
 		done;;
 	alsa)
-		alsactl store;;
+		alsactl --file /var/run/alsa/asound.state store;;
         cupsd)
 		killall cupsd;;
 	avahi-daemon)
@@ -282,5 +283,10 @@ start|stop|restart)
 	echo "rc list		   shows status of all daemons (default action)"
 	echo "rc start [daemons]   starts daemons"
 	echo "rc stop [daemons]	   stops daemons"
-	echo "rc restart [daemons] restarts daemons";;
+	echo "rc restart [daemons] restarts daemons"
+	echo
+	echo "System Actions:"
+	echo "rc reboot		   reboots the system"
+	echo "rc shutdown   	   shutdown the system"
+	
 esac
