@@ -131,14 +131,15 @@ on_reboot () {
 }
 
 default_start() {
-	echo_color 2 :: starting "$1"...
 	case "$1" in
 	all)
+		echo_color 2 :: starting all enabled daemons...
 		for dmn in $DAEMONS $ENABLED; do
 			default_poll all "${dmn##@}" || default_start "${dmn##@}"
 		done;;
 	*)
-		exec "/etc/rc-car/service/$1.tire" -start;;
+		echo_color 2 :: starting "$1"...
+		exec /etc/rc-car/service/$1.tire -start;;
 	esac
 }
 
@@ -167,9 +168,7 @@ default_restart() {
 default_poll() {
 	case "$1" in
 	all)
-		for d in dmn in $DAEMONS $ENABLED; do
-			pidof -x "${dmn##@}" >/dev/null 2>&1
-		done;;
+		pgrep "$2" >/dev/null 2>&1;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -poll;;
 	esac
@@ -191,15 +190,15 @@ shutdown)
 	on_shutdown;;
 reboot)
 	on_reboot;;
-start|stop|restart)
-	cmd="$1"
-	shift
-	for dmn in $DAEMONS; do
-		default_"${cmd}" "$dmn"
-	done;;
+start)
+	default_start "$2";;
+stop)
+	default_stop "$2";;
+restart)
+	default_restart "$2";;
 ''|list)
 	for dmn in $DAEMONS; do
-		if default_poll all "$dmn" ; then
+		if default_poll all "$dmn" >/dev/null 2>&1; then
 			echo_color 2 [X] "$dmn"
 		else
 			echo_color 0 [ ] "$dmn"
