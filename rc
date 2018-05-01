@@ -125,7 +125,7 @@ default_start() {
 	all)
 		echo_color 2 ":: starting all enabled daemons..."
 		for dmn in $ENABLED; do
-			default_poll all "${dmn##@}" || default_start "${dmn##@}"
+			default_poll all "$dmn" || default_start "$dmn"
 		done;;
 	*)
 		echo_color 2 ":: starting $1..."
@@ -138,7 +138,7 @@ default_stop() {
 	all)
 		echo_color 1 ":: stopping all enabled daemons..."
 		for dmn in $ENABLED; do
-			default_poll all "${dmn##@}" && default_stop "${dmn##@}"
+			default_poll all "$dmn" && default_stop "$dmn"
 		done;;
 	*)
 		echo_color 1 ":: stopping $1..."
