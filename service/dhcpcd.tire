@@ -5,26 +5,11 @@ NAME="dhcpcd"
 
 main () {
     case "$1" in
-    -start) 
-	if ip link | grep -Fq $NETWORK_INTERFACE; then :; else
-		echo_color 3 ":: waiting for $NETWORK_INTERFACE to settle..."
-		for i in $(seq 100); do
-			ip link | grep -Fq $NETWORK_INTERFACE && break
-			sleep 1
-		done
-	fi
-	dhcpcd -nqb;;
+    -start) dhcpcd -nqb;;
     -stop) killall dhcpcd;;
     -restart) 
 	killall dhcpcd
 	sleep 1
-	if ip link | grep -Fq $NETWORK_INTERFACE; then :; else
-		echo_color 3 ":: waiting for $NETWORK_INTERFACE to settle..."
-		for i in $(seq 100); do
-			ip link | grep -Fq $NETWORK_INTERFACE && break
-			sleep 1
-		done
-	fi
 	dhcpcd -nqb;;
     -poll)
 	echo_color 3 ":: $NAME is running."
