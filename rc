@@ -140,7 +140,7 @@ default_start() {
 	all)
 		for dmn in $ENABLED; do
 			exec "/etc/rc-car/service/$dmn.tire" -start
-		done
+		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -start;;
 	esac
@@ -152,7 +152,7 @@ default_stop() {
 	all)
 		for dmn in $ENABLED; do
 			exec "/etc/rc-car/service/$dmn.tire" -stop
-		done
+		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -stop;;
 	esac
@@ -163,7 +163,7 @@ default_restart() {
 	all)
 		for dmn in $ENABLED; do
 			exec "/etc/rc-car/service/$dmn.tire" -restart
-		done
+		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -restart;;
 	esac
