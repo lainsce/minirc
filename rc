@@ -139,7 +139,7 @@ default_start() {
 	case "$1" in
 	all)
 		for dmn in $DAEMONS $ENABLED; do
-			default_poll "${dmn##@}" || default_start "${dmn##@}"
+			default_start "${dmn##@}"
 		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -start;;
@@ -151,7 +151,7 @@ default_stop() {
 	case "$1" in
 	all)
 		for dmn in $DAEMONS $ENABLED; do
-			default_poll "${dmn##@}" && default_stop "${dmn##@}"
+			default_stop "${dmn##@}"
 		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -stop;;
