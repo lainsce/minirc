@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This file is executed on boot to initialize the system and can also be run by
 # the user to start/stop daemons.
 
