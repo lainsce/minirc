@@ -135,7 +135,7 @@ default_start() {
 	case "$1" in
 	all)
 		for dmn in $DAEMONS $ENABLED; do
-			default_poll "${dmn##@}" || default_start "${dmn##@}"
+			default_poll all "${dmn##@}" || default_start "${dmn##@}"
 		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -start;;
@@ -147,7 +147,7 @@ default_stop() {
 	case "$1" in
 	all)
 		for dmn in $DAEMONS $ENABLED; do
-			default_poll "${dmn##@}" && default_stop "${dmn##@}"
+			default_poll all "${dmn##@}" && default_stop "${dmn##@}"
 		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -stop;;
@@ -167,7 +167,9 @@ default_restart() {
 default_poll() {
 	case "$1" in
 	all)
-		pgrep "(^|/)$1\$" >/dev/null 2>&1;;
+		for d in dmn in $DAEMONS $ENABLED; do
+			pidof -x "${dmn##@}" >/dev/null 2>&1
+		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -poll;;
 	esac
@@ -197,7 +199,7 @@ start|stop|restart)
 	done;;
 ''|list)
 	for dmn in $DAEMONS; do
-		if default_poll "$dmn" >/dev/null 2>&1; then
+		if default_poll all "$dmn" ; then
 			echo_color 2 [X] "$dmn"
 		else
 			echo_color 0 [ ] "$dmn"
