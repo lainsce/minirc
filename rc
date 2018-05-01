@@ -137,7 +137,11 @@ on_reboot () {
 default_start() {
 	echo_color 2 :: starting "$1"...
 	case "$1" in
-	*|all)
+	all)
+		for dmn in $ENABLED; do
+			exec "/etc/rc-car/service/$dmn.tire" -start
+		done
+	*)
 		exec "/etc/rc-car/service/$1.tire" -start;;
 	esac
 }
@@ -145,14 +149,22 @@ default_start() {
 default_stop() {
 	echo_color 1 :: stopping "$1"...
 	case "$1" in
-	*|all)
+	all)
+		for dmn in $ENABLED; do
+			exec "/etc/rc-car/service/$dmn.tire" -stop
+		done
+	*)
 		exec "/etc/rc-car/service/$1.tire" -stop;;
 	esac
 }
 
 default_restart() {
 	case "$1" in
-	*|all)
+	all)
+		for dmn in $ENABLED; do
+			exec "/etc/rc-car/service/$dmn.tire" -restart
+		done
+	*)
 		exec "/etc/rc-car/service/$1.tire" -restart;;
 	esac
 }
