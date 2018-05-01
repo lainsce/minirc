@@ -1,4 +1,4 @@
-# ![](data/rc-car-icon.png) rc-car (fork of minirc)
+# ![](data/rccar-icon.png) rc-car (fork of minirc)
 
 The script "rc" is a minimalistic init script made for use with busybox init.
 
