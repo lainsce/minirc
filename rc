@@ -62,11 +62,7 @@ on_boot() {
 
 	echo_color 3 :: starting daemons...
 	for dmn in $ENABLED; do
-		if [ "$(echo "$dmn" | awk '{ s=substr($0, 1, 1); print s; }')" = '@' ]; then
-			default_start "$(echo "$dmn" | awk '{ s=substr($0, 2); print s; }')" &
-		else
-			default_start "$dmn"
-		fi
+		default_start "$dmn"
 	done
 }
 
@@ -138,8 +134,8 @@ default_start() {
 	echo_color 2 :: starting "$1"...
 	case "$1" in
 	all)
-		for dmn in $ENABLED; do
-			exec "/etc/rc-car/service/$dmn.tire" -start
+		for dmn in $DAEMONS $ENABLED; do
+			default_poll "${dmn##@}" || default_start "${dmn##@}"
 		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -start;;
@@ -150,8 +146,8 @@ default_stop() {
 	echo_color 1 :: stopping "$1"...
 	case "$1" in
 	all)
-		for dmn in $ENABLED; do
-			exec "/etc/rc-car/service/$dmn.tire" -stop
+		for dmn in $DAEMONS $ENABLED; do
+			default_poll "${dmn##@}" && default_stop "${dmn##@}"
 		done;;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -stop;;
@@ -161,9 +157,8 @@ default_stop() {
 default_restart() {
 	case "$1" in
 	all)
-		for dmn in $ENABLED; do
-			exec "/etc/rc-car/service/$dmn.tire" -restart
-		done;;
+		default_stop "$@"
+		default_start "$@";;
 	*)
 		exec "/etc/rc-car/service/$1.tire" -restart;;
 	esac
@@ -197,11 +192,10 @@ reboot)
 start|stop|restart)
 	cmd="$1"
 	shift
-	for dmn in ${@:-$DAEMONS}; do
+	for dmn in $DAEMONS; do
 		default_"${cmd}" "$dmn"
 	done;;
 ''|list)
-	# list all daemons and their status
 	for dmn in $DAEMONS; do
 		if default_poll "$dmn" >/dev/null 2>&1; then
 			echo_color 2 [X] "$dmn"
