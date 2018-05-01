@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for bitlbee
+NAME="bitlbee"
+
+main () {
+    case "$1" in
+    -start) su -s /bin/sh -c 'bitlbee -F' bitlbee;;
+    -stop) killall bitlbee;;
+    -restart) 
+	killall bitlbee
+	sleep 1
+	su -s /bin/sh -c 'bitlbee -F' bitlbee;;
+    -poll) return 0;; # doesn't make much sense for this service
+    esac
+}
+
+main

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for ntpd
+NAME="ntpd"
+
+main () {
+    case "$1" in
+    -start) ntpd -s;;
+    -stop) killall ntpd;;
+    -restart) 
+	killall ntpd
+	sleep 1
+	ntpd -s;;
+    -poll) return 0;;
+    esac
+}
+
+main

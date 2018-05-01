@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# File for iptables
+NAME="iptables"
+
+main () {
+    case "$1" in
+    -start) iptables-restore < /etc/iptables/iptables.rules;;
+    -stop) 
+	for table in $(cat /proc/net/ip_tables_names); do
+		iptables-restore < /var/lib/iptables/empty-"$table".rules
+	done;;
+    -restart) 
+	for table in $(cat /proc/net/ip_tables_names); do
+		iptables-restore < /var/lib/iptables/empty-"$table".rules
+	done
+	sleep 1
+	iptables-restore < /etc/iptables/iptables.rules;;
+    -poll) iptables -L -n | grep -m 1 -q '^ACCEPT\|^REJECT';;
+    esac
+}
+
+main

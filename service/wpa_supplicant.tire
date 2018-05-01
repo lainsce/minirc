@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for wpa_supplicant
+NAME="wpa_supplicant"
+
+main () {
+    case "$1" in
+    -start) wpa_supplicant -Dwext -B -i"$WIFI_INTERFACE" -c/etc/wpa_supplicant.conf;;
+    -stop) killall vsftpd;;
+    -restart) 
+	killall wpa_supplicant
+	sleep 1
+	wpa_supplicant -Dwext -B -i"$WIFI_INTERFACE" -c/etc/wpa_supplicant.conf;;
+    -poll) return 0;;
+    esac
+}
+
+main

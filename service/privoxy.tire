@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for privoxy
+NAME="privoxy"
+
+main () {
+    case "$1" in
+    -start) privoxy --user privoxy.privoxy /etc/privoxy/config;;
+    -stop) killall ;;
+    -restart) 
+	killall privoxy
+	sleep 1
+	privoxy --user privoxy.privoxy /etc/privoxy/config;;
+    -poll) return 0;;
+    esac
+}
+
+main

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for icecast
+NAME="icecast"
+
+main () {
+    case "$1" in
+    -start) icecast -b -c /etc/icecast.xml;;
+    -stop) killall icecast;;
+    -restart) 
+	killall icecast
+	sleep 1
+	icecast -b -c /etc/icecast.xml;;
+    -poll) return 0;; # doesn't make much sense for this service
+    esac
+}
+
+main
