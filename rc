@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # This file is executed on boot to initialize the system and can also be run by
 # the user to start/stop daemons.
 
@@ -6,7 +6,7 @@
 . /etc/rccar.conf
 
 on_boot() {
-	echo_color 4 RC-Car 1.0 booting up $(cat /etc/issue | head -n +1 | awk '{print $1}') [$(uname -rms)]
+	echo_color 4 "RC-Car 1.0 booting up $(cat /etc/issue | head -n +1 | awk '{print $1}') [$(uname -rms)]"
 
 	# mount the API filesystem
 	echo_color 3 ":: mounting API filesystem..."
@@ -71,9 +71,9 @@ on_shutdown() {
 
 	# TERM & KILL all programs
 	echo_color 3 ":: killing programs..."
-	trap "kill 0" SIGTERM
+	kill -sTERM 0
 	sleep 3
-	trap "kill 0" SIGKILL
+	kill -sKILL 0
 
 	# umount the API filesystem
 	echo_color 3 ":: unmounting API filesystem..."
@@ -103,9 +103,9 @@ on_reboot () {
 
 	# TERM & KILL all programs
 	echo_color 3 ":: killing programs..."
-	trap "kill 0" SIGTERM
+	kill -sTERM 0
 	sleep 3
-	trap "kill 0" SIGKILL
+	kill -sKILL 0
 
 	# umount the API filesystem
 	echo_color 3 ":: unmounting API filesystem..."
@@ -128,7 +128,7 @@ default_start() {
 			default_poll all "${dmn##@}" || default_start "${dmn##@}"
 		done;;
 	*)
-		echo_color 2 ":: starting "$1"..."
+		echo_color 2 ":: starting $1..."
 		exec /etc/rc-car/service/"$1".tire -start;;
 	esac
 }
@@ -141,7 +141,7 @@ default_stop() {
 			default_poll all "${dmn##@}" && default_stop "${dmn##@}"
 		done;;
 	*)
-		echo_color 1 ":: stopping "$1"..."
+		echo_color 1 ":: stopping $1..."
 		exec /etc/rc-car/service/"$1".tire -stop;;
 	esac
 }
@@ -149,8 +149,8 @@ default_stop() {
 default_restart() {
 	case "$1" in
 	all)
-		default_stop "$@"
-		default_start "$@";;
+		default_stop all
+		default_start all;;
 	*)
 		exec /etc/rc-car/service/"$1".tire -restart;;
 	esac
@@ -161,6 +161,7 @@ default_poll() {
 	all)
 		pgrep "$2" >/dev/null 2>&1;;
 	*)
+		echo_color 4 ":: polling $1..."
 		exec /etc/rc-car/service/"$1".tire -poll;;
 	esac
 }
@@ -168,7 +169,7 @@ default_poll() {
 echo_color() {
   color="$1"
   shift
-  printf "\033[1;3%sm%s\033[00m\n" "$color" "$*"
+  printf "\\033[1;3%sm%s\\033[00m\\n" "$color" "$*"
 }
 
 

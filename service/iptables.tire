@@ -22,4 +22,4 @@ main () {
     esac
 }
 
-main
+main "$@"
