@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for alsa
+NAME="alsa"
+
+main () {
+    case "$1" in
+    -start) alsactl --file /var/run/alsa/asound.state restore;;
+    -stop) alsactl --file /var/run/alsa/asound.state store;;
+    -restart) 
+	alsactl --file /var/run/alsa/asound.state store
+	sleep 1
+	alsactl --file /var/run/alsa/asound.state restore;;
+    -poll) return 0;; # doesn't make much sense for this service
+    esac
+}
+
+main

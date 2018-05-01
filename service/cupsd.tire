@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for cupsd
+NAME="cupsd"
+
+main () {
+    case "$1" in
+    -start) cupsd;;
+    -stop) killall cupsd;;
+    -restart) 
+	killall cupsd
+	sleep 1
+	cupsd;;
+    -poll) return 0;; # doesn't make much sense for this service
+    esac
+}
+
+main

@@ -141,18 +141,8 @@ default_start() {
 		for dmn in $DAEMONS $ENABLED; do
 			default_poll "${dmn##@}" || default_start "${dmn##@}"
 		done;;
-	alsa)
-		alsactl --file /var/run/alsa/asound.state restore;;
-        cupsd)
-		cupsd;;
-	avahi-daemon)
-		avahi-daemon &> /dev/null &;;
 	bitlbee)
 		su -s /bin/sh -c 'bitlbee -F' bitlbee;;
-	dbus)
-		mkdir -p /run/dbus &&
-			dbus-uuidgen --ensure &&
-			dbus-daemon --system;;
 	iptables)
 		iptables-restore < /etc/iptables/iptables.rules;;
 	sshd)
@@ -185,8 +175,7 @@ default_start() {
 	icecast)
 		icecast -b -c /etc/icecast.xml;;
 	*)
-		# fallback: start the command
-		"$1";;
+		exec "/etc/rc-car/service/$1.tire" -start;;
 	esac
 }
 
@@ -197,16 +186,6 @@ default_stop() {
 		for dmn in $DAEMONS $ENABLED; do
 			default_poll "${dmn##@}" && default_stop "${dmn##@}"
 		done;;
-	alsa)
-		alsactl --file /var/run/alsa/asound.state store;;
-        cupsd)
-		killall cupsd;;
-	avahi-daemon)
-		avahi-daemon -k;;
-	dbus)
-		killall dbus-launch
-		killall dbus-daemon
-		rm /run/dbus/pid;;
 	iptables)
 		for table in $(cat /proc/net/ip_tables_names); do
 			iptables-restore < /var/lib/iptables/empty-"$table".rules
@@ -214,8 +193,7 @@ default_stop() {
 	tlp)
 		tlp init stop;;
 	*)
-		# fallback: kill all processes with the name of the command
-		killall "$1";;
+		exec "/etc/rc-car/service/$1.tire" -stop;;
 	esac
 }
 
@@ -225,22 +203,16 @@ default_restart() {
 		# Make sure rc-car doesn't hang up when restarting it remotely
 		busybox setsid sh -c '"$0" stop "$@"; "$0" start "$@"' "$0" "$@";;
 	*)
-		default_stop "$@"
-		default_start "$@";;
+		exec "/etc/rc-car/service/$1.tire" -restart;;
 	esac
 }
 
 default_poll() {
 	case "$1" in
-	alsa)
-		return 0;;  # doesn't make much sense for this service
 	iptables)
 		iptables -L -n | grep -m 1 -q '^ACCEPT\|^REJECT';;
-	dbus)
-		test -e /run/dbus/pid;;
 	*)
-		# fallback: check if any processes of that name are running
-		pgrep "(^|/)$1\$" >/dev/null 2>&1;;
+		exec "/etc/rc-car/service/$1.tire" -poll;;
 	esac
 }
 

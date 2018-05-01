@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for avahi-daemon
+NAME="avahi-daemon"
+
+main () {
+    case "$1" in
+    -start) avahi-daemon &> /dev/null &;;
+    -stop) avahi-daemon -k;;
+    -restart) 
+	avahi-daemon -k
+	sleep 1
+	avahi-daemon &> /dev/null &;;
+    -poll) return 0;; # doesn't make much sense for this service
+    esac
+}
+
+main
