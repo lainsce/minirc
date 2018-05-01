@@ -5,7 +5,7 @@
 # Fallback Configuration Values, to be able to run even with a broken, deleted
 # or outdated rccar.conf:
 DAEMONS="NetworkManager acpid alsa avahi-daemon crond cupsd dbus dhcpcd haveged iptables lighttpd mpd ntpd polipo privoxy sshd syslog-ng vsftpd wpa_supplicant"
-ENABLED="@syslog-ng @crond @dbus"
+ENABLED="syslog-ng crond dbus"
 UDEV="busybox"
 NETWORK_INTERFACE="eth0"
 WIFI_INTERFACE="wlan0"
