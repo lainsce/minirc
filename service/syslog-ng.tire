@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for syslog-ng
+NAME="syslog-ng"
+
+main () {
+    case "$1" in
+    -start) syslog-ng;;
+    -stop) killall syslog-ng;;
+    -restart) 
+	killall syslog-ng
+	sleep 1
+	syslog-ng;;
+    -poll) return 0;; # doesn't make much sense for this service
+    esac
+}
+
+main
