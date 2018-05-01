@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# File for crond
+NAME="crond"
+
+main () {
+    case "$1" in
+    -start) crond;;
+    -stop) killall crond;;
+    -restart) 
+	killall crond
+	sleep 1
+	crond;;
+    -poll) return 0;; # doesn't make much sense for this service
+    esac
+}
+
+main
