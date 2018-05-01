@@ -11,7 +11,9 @@ main () {
 	killall privoxy
 	sleep 1
 	privoxy --user privoxy.privoxy /etc/privoxy/config;;
-    -poll) return 0;;
+    -poll)
+	echo_color 3 ":: $NAME is running."
+	return 0;; # doesn't make much sense for this service
     esac
 }
 

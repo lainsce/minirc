@@ -11,7 +11,9 @@ main () {
 	killall wpa_supplicant
 	sleep 1
 	wpa_supplicant -Dwext -B -i"$WIFI_INTERFACE" -c/etc/wpa_supplicant.conf;;
-    -poll) return 0;;
+    -poll)
+	echo_color 3 ":: $NAME is running."
+	return 0;; # doesn't make much sense for this service
     esac
 }
 

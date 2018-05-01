@@ -19,7 +19,9 @@ main () {
 	mkdir -p /run/dbus &&
 	dbus-uuidgen --ensure &&
 	dbus-daemon --system;;
-    -poll) test -e /run/dbus/pid;;
+    -poll)
+	echo_color 3 ":: $NAME is running."
+	test -e /run/dbus/pid;;
     esac
 }
 

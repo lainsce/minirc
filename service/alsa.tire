@@ -11,7 +11,9 @@ main () {
 	alsactl --file /var/run/alsa/asound.state store
 	sleep 1
 	alsactl --file /var/run/alsa/asound.state restore;;
-    -poll) return 0;; # doesn't make much sense for this service
+    -poll)
+	echo_color 3 ":: $NAME is running."
+	return 0;; # doesn't make much sense for this service
     esac
 }
 

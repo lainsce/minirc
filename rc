@@ -2,16 +2,6 @@
 # This file is executed on boot to initialize the system and can also be run by
 # the user to start/stop daemons.
 
-# Fallback Configuration Values, to be able to run even with a broken, deleted
-# or outdated rccar.conf:
-DAEMONS="NetworkManager acpid alsa avahi-daemon crond cupsd dbus dhcpcd haveged iptables lighttpd mpd ntpd polipo privoxy sshd syslog-ng vsftpd wpa_supplicant"
-ENABLED="syslog-ng crond dbus"
-UDEV="busybox"
-NETWORK_INTERFACE="eth0"
-WIFI_INTERFACE="wlan0"
-HOSTNAME="$(cat /etc/hostname)"
-KEYMAP=us
-
 # Read system config
 . /etc/rccar.conf
 
@@ -19,7 +9,7 @@ on_boot() {
 	echo_color 4 RC-Car 1.0 booting up $(cat /etc/issue | head -n +1 | awk '{print $1}') [$(uname -rms)]
 
 	# mount the API filesystem
-	echo_color 3 :: mounting API filesystem...
+	echo_color 3 ":: mounting API filesystem..."
 	mountpoint -q /proc	|| mount -t proc proc /proc -o nosuid,noexec,nodev
 	mountpoint -q /sys	 || mount -t sysfs sys /sys -o nosuid,noexec,nodev
 	mountpoint -q /run	 || mount -t tmpfs run /run -o mode=0755,nosuid,nodev
@@ -29,10 +19,10 @@ on_boot() {
 	mountpoint -q /dev/shm || mount -t tmpfs shm /dev/shm -o mode=1777,nosuid,nodev
 
 	# initialize system
-	echo_color 3 :: setting up loopback device...
+	echo_color 3 ":: setting up loopback device..."
 	/usr/sbin/ip link set up dev lo
 
-	echo_color 3 :: initializing udev...
+	echo_color 3 ":: initializing udev..."
 	if [ "$UDEV" = systemd ]; then
 		/usr/lib/systemd/systemd-udevd --daemon
 		/usr/bin/udevadm trigger --action=add --type=subsystems
@@ -46,21 +36,21 @@ on_boot() {
 		echo /sbin/mdev > /proc/sys/kernel/hotplug
 	fi
 
-	echo_color 3 :: setting hostname...
+	echo_color 3 ":: setting hostname..."
 	echo "$HOSTNAME" >| /proc/sys/kernel/hostname
         
-	echo_color 3 :: setting keymap...
+	echo_color 3 ":: setting keymap..."
 	loadkeys $KEYMAP
 
-	echo_color 3 :: mounting...
-	mount -o remount,rw /
+	echo_color 3 ":: mounting..."
 	mount -a
+	mount -o remount,rw /
 	swapon -a
 
-	echo_color 3 :: running fsck on partitions...
+	echo_color 3 ":: running fsck on partitions..."
 	fsck -A -T -C -a
 
-	echo_color 3 :: starting daemons...
+	echo_color 3 ":: starting daemons..."
 	for dmn in $ENABLED; do
 		default_start "$dmn"
 	done
@@ -68,11 +58,11 @@ on_boot() {
 
 on_shutdown() {
 	# stop the default daemons
-	echo_color 3 :: stopping daemons...
+	echo_color 3 ":: stopping daemons..."
 	default_stop all
 
 	# shut down udev
-	echo_color 3 :: shutting down udev...
+	echo_color 3 ":: shutting down udev..."
 	if [ "$UDEV" = systemd ]; then
 		killall systemd-udevd
 	elif [ "$UDEV" = eudev ]; then
@@ -80,19 +70,19 @@ on_shutdown() {
 	fi
 
 	# TERM & KILL all programs
-	echo_color 3 :: killing programs...
+	echo_color 3 ":: killing programs..."
 	trap "kill 0" SIGTERM
 	sleep 3
 	trap "kill 0" SIGKILL
 
 	# umount the API filesystem
-	echo_color 3 :: unmounting API filesystem...
+	echo_color 3 ":: unmounting API filesystem..."
 	umount -r /run
 	umount -a -r -t nosysfs,noproc,nodevtmpfs,notmpfs
 	swapoff -a
 
 	# mount root read-only
-	echo_color 3 :: setting root partition read-only..
+	echo_color 3 ":: setting root partition read-only..."
 	mount -o remount,ro /
 
 	busybox poweroff
@@ -100,11 +90,11 @@ on_shutdown() {
 
 on_reboot () {
 	# stop the default daemons
-	echo_color 3 :: stopping daemons...
+	echo_color 3 ":: stopping daemons..."
 	default_stop all
 
 	# shut down udev
-	echo_color 3 :: shutting down udev...
+	echo_color 3 ":: shutting down udev..."
 	if [ "$UDEV" = systemd ]; then
 		killall systemd-udevd
 	elif [ "$UDEV" = eudev ]; then
@@ -112,19 +102,19 @@ on_reboot () {
 	fi
 
 	# TERM & KILL all programs
-	echo_color 3 :: killing programs...
+	echo_color 3 ":: killing programs..."
 	trap "kill 0" SIGTERM
 	sleep 3
 	trap "kill 0" SIGKILL
 
 	# umount the API filesystem
-	echo_color 3 :: unmounting API filesystem...
+	echo_color 3 ":: unmounting API filesystem..."
 	umount -r /run
 	umount -a -r -t nosysfs,noproc,nodevtmpfs,notmpfs
 	swapoff -a
 
 	# mount root read-only
-	echo_color 3 :: setting root partition read-only..
+	echo_color 3 ":: setting root partition read-only..."
 	mount -o remount,ro /
 
 	busybox reboot
@@ -133,25 +123,26 @@ on_reboot () {
 default_start() {
 	case "$1" in
 	all)
-		echo_color 2 :: starting all enabled daemons...
+		echo_color 2 ":: starting all enabled daemons..."
 		for dmn in $DAEMONS $ENABLED; do
 			default_poll all "${dmn##@}" || default_start "${dmn##@}"
 		done;;
 	*)
-		echo_color 2 :: starting "$1"...
-		exec /etc/rc-car/service/$1.tire -start;;
+		echo_color 2 ":: starting "$1"..."
+		exec /etc/rc-car/service/"$1".tire -start;;
 	esac
 }
 
 default_stop() {
-	echo_color 1 :: stopping "$1"...
 	case "$1" in
 	all)
+		echo_color 1 ":: stopping all enabled daemons..."
 		for dmn in $DAEMONS $ENABLED; do
 			default_poll all "${dmn##@}" && default_stop "${dmn##@}"
 		done;;
 	*)
-		exec "/etc/rc-car/service/$1.tire" -stop;;
+		echo_color 1 ":: stopping "$1"..."
+		exec /etc/rc-car/service/"$1".tire -stop;;
 	esac
 }
 
@@ -161,7 +152,7 @@ default_restart() {
 		default_stop "$@"
 		default_start "$@";;
 	*)
-		exec "/etc/rc-car/service/$1.tire" -restart;;
+		exec /etc/rc-car/service/"$1".tire -restart;;
 	esac
 }
 
@@ -170,7 +161,7 @@ default_poll() {
 	all)
 		pgrep "$2" >/dev/null 2>&1;;
 	*)
-		exec "/etc/rc-car/service/$1.tire" -poll;;
+		exec /etc/rc-car/service/"$1".tire -poll;;
 	esac
 }
 

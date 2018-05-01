@@ -16,7 +16,9 @@ main () {
 	done
 	sleep 1
 	iptables-restore < /etc/iptables/iptables.rules;;
-    -poll) iptables -L -n | grep -m 1 -q '^ACCEPT\|^REJECT';;
+    -poll)
+	echo_color 3 ":: $NAME is running."
+	iptables -L -n | grep -m 1 -q '^ACCEPT\|^REJECT';;
     esac
 }
 

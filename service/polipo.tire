@@ -11,7 +11,9 @@ main () {
 	killall polipo
 	sleep 1
 	su -c 'polipo daemonise=true logFile="/var/log/polipo.log"' -s /bin/sh - nobody;;
-    -poll) return 0;;
+    -poll)
+	echo_color 3 ":: $NAME is running."
+	return 0;; # doesn't make much sense for this service
     esac
 }
 

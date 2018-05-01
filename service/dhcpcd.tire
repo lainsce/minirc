@@ -26,7 +26,9 @@ main () {
 		done
 	fi
 	dhcpcd -nqb;;
-    -poll) return 0;; # doesn't make much sense for this service
+    -poll)
+	echo_color 3 ":: $NAME is running."
+	return 0;; # doesn't make much sense for this service
     esac
 }
 
