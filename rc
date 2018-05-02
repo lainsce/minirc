@@ -6,7 +6,7 @@
 . /etc/rccar.conf
 
 on_boot() {
-	echo_color 4 "RC-Car 1.0 booting up $(cat /etc/issue | head -n +1 | awk '{print $1}') [$(uname -rms)]"
+	echo_color 4 "RC-Car 1.0 booting up $(head -n +1 /etc/issue | awk '{print $1}') [$(uname -rms)]"
 
 	# mount the API filesystem
 	echo_color 3 ":: mounting API filesystem..."
