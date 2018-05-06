@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# File for alsa
+NAME="alsa"
+
+main(){
+	case "$1" in
+		-start) alsactl --file /var/run/alsa/asound.state restore
+		;;
+		-stop) alsactl --file /var/run/alsa/asound.state store
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
+}
+
+main "$@"
