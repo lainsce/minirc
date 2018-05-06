@@ -3,18 +3,20 @@
 # File for NetworkManager
 NAME="NetworkManager"
 
-main () {
+main(){
     case "$1" in
-    -start) NetworkManager;;
-    -stop) killall NetworkManager;;
-    -restart) 
-	killall NetworkManager
-	sleep 1
-	NetworkManager;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+	    -start) NetworkManager
+		;;
+	    -stop) killall NetworkManager
+		;;
+	    -restart) 
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

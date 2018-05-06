@@ -4,17 +4,19 @@
 NAME="wpa_supplicant"
 
 main () {
-    case "$1" in
-    -start) wpa_supplicant -Dwext -B -i"$WIFI_INTERFACE" -c/etc/wpa_supplicant.conf;;
-    -stop) killall vsftpd;;
-    -restart) 
-	killall wpa_supplicant
-	sleep 1
-	wpa_supplicant -Dwext -B -i"$WIFI_INTERFACE" -c/etc/wpa_supplicant.conf;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+	case "$1" in
+		-start) wpa_supplicant -Dwext -B -i"$WIFI_INTERFACE" -c/etc/wpa_supplicant.conf
+		;;
+		-stop) killall wpa_supplicant
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

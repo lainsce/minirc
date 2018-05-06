@@ -3,17 +3,19 @@
 # File for avahi-daemon
 NAME="avahi-daemon"
 
-main () {
+main(){
     case "$1" in
-    -start) avahi-daemon &> /dev/null &;;
-    -stop) avahi-daemon -k;;
-    -restart) 
-	avahi-daemon -k
-	sleep 1
-	avahi-daemon &> /dev/null &;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
+    	-start) avahi-daemon -D
+		;;
+    	-stop) avahi-daemon -k
+		;;
+    	-restart) 
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
     esac
 }
 

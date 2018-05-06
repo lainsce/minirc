@@ -3,18 +3,20 @@
 # File for polipo
 NAME="polipo"
 
-main () {
-    case "$1" in
-    -start) su -c 'polipo daemonise=true logFile="/var/log/polipo.log"' -s /bin/sh - nobody;;
-    -stop) killall polipo;;
-    -restart) 
-	killall polipo
-	sleep 1
-	su -c 'polipo daemonise=true logFile="/var/log/polipo.log"' -s /bin/sh - nobody;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+main(){
+	case "$1" in
+		-start) su -c 'polipo daemonise=true logFile="/var/log/polipo.log"' -s /bin/sh - nobody
+		;;
+		-stop) killall polipo
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

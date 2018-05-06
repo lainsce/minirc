@@ -3,18 +3,20 @@
 # File for bitlbee
 NAME="bitlbee"
 
-main () {
-    case "$1" in
-    -start) su -s /bin/sh -c 'bitlbee -F' bitlbee;;
-    -stop) killall bitlbee;;
-    -restart) 
-	killall bitlbee
-	sleep 1
-	su -s /bin/sh -c 'bitlbee -F' bitlbee;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+main(){
+	case "$1" in
+		-start) su -s /bin/sh -c 'bitlbee -F' bitlbee
+		;;
+		-stop) killall bitlbee
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

@@ -3,18 +3,20 @@
 # File for privoxy
 NAME="privoxy"
 
-main () {
-    case "$1" in
-    -start) privoxy --user privoxy.privoxy /etc/privoxy/config;;
-    -stop) killall ;;
-    -restart) 
-	killall privoxy
-	sleep 1
-	privoxy --user privoxy.privoxy /etc/privoxy/config;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+main(){
+	case "$1" in
+		-start) privoxy --user privoxy.privoxy /etc/privoxy/config
+		;;
+		-stop) killall privoxy
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

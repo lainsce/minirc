@@ -3,18 +3,20 @@
 # File for crond
 NAME="crond"
 
-main () {
-    case "$1" in
-    -start) crond;;
-    -stop) killall crond;;
-    -restart) 
-	killall crond
-	sleep 1
-	crond;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+main(){
+	case "$1" in
+		-start) crond
+		;;
+		-stop) killall crond
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

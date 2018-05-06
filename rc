@@ -152,6 +152,7 @@ default_restart() {
 		default_stop all
 		default_start all;;
 	*)
+		echo_color 4 ":: restarting $1"
 		/etc/rc-car/service/"$1".tire -restart;;
 	esac
 }
@@ -162,7 +163,10 @@ default_poll() {
 		pgrep "$2" >/dev/null 2>&1;;
 	*)
 		echo_color 4 ":: polling $1..."
-		/etc/rc-car/service/"$1".tire -poll;;
+		/etc/rc-car/service/"$1".tire -poll &&
+		(echo_color 2 ":: $1 is running."; return 0) ||
+		(echo_color 1 ":: $1 is not running."; return 1)
+	;;
 	esac
 }
 
@@ -176,38 +180,40 @@ echo_color() {
 #===================
 # handle arguments
 case "$1" in
-init)
-	on_boot;;
-shutdown)
-	on_shutdown;;
-reboot)
-	on_reboot;;
-start)
-	default_start "$2";;
-stop)
-	default_stop "$2";;
-restart)
-	default_restart "$2";;
-''|list)
-	for dmn in $DAEMONS; do
-		if default_poll all "$dmn" >/dev/null 2>&1; then
-			echo_color 2 [X] "$dmn"
-		else
-			echo_color 0 [ ] "$dmn"
-		fi
-	done;;
--h|--help)
-	echo "rc-car 1.0"
-	echo "Usage: [--help] [--version] <action> [list of daemons]"
-	echo
-	echo "Actions:"
-	echo "rc list		   shows status of all daemons (default action)"
-	echo "rc start [daemons]   starts daemons"
-	echo "rc stop [daemons]	   stops daemons"
-	echo "rc restart [daemons] restarts daemons"
-	echo
-	echo "System Actions:"
-	echo "rc reboot		   reboots the system"
-	echo "rc shutdown   	   shutdown the system"
-
+	init)
+		on_boot;;
+	shutdown)
+		on_shutdown;;
+	reboot)
+		on_reboot;;
+	start)
+		default_start "$2";;
+	stop)
+		default_stop "$2";;
+	restart)
+		default_restart "$2";;
+	poll)
+		default_poll "$2";;
+	''|list)
+		for dmn in $DAEMONS; do
+			if default_poll all "$dmn" >/dev/null 2>&1; then
+				echo_color 2 [X] "$dmn"
+			else
+				echo_color 0 [ ] "$dmn"
+			fi
+		done;;
+	-h|--help)
+		echo "rc-car 1.0"
+		echo "Usage: [--help] [--version] <action> [list of daemons]"
+		echo
+		echo "Actions:"
+		echo "rc list                    shows status of all daemons (default action)"
+		echo "rc start [daemons]         starts daemons"
+		echo "rc stop [daemons]	   stops daemons"
+		echo "rc restart [daemons]       restarts daemons"
+		echo
+		echo "System Actions:"
+		echo "rc reboot	           reboots the system"
+		echo "rc shutdown                shutdown the system"
+	;;
 esac

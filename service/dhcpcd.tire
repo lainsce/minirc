@@ -3,18 +3,20 @@
 # File for dhcpcd
 NAME="dhcpcd"
 
-main () {
-    case "$1" in
-    -start) dhcpcd -nqb;;
-    -stop) killall dhcpcd;;
-    -restart) 
-	killall dhcpcd
-	sleep 1
-	dhcpcd -nqb;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+main(){
+	case "$1" in
+		-start) dhcpcd -nqb
+		;;
+		-stop) killall dhcpcd
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

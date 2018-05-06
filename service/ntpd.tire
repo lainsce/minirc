@@ -3,18 +3,20 @@
 # File for ntpd
 NAME="ntpd"
 
-main () {
-    case "$1" in
-    -start) ntpd -s;;
-    -stop) killall ntpd;;
-    -restart) 
-	killall ntpd
-	sleep 1
-	ntpd -s;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+main(){
+	case "$1" in
+		-start) ntpd -s > /dev/null 2>&1 &
+		;;
+		-stop) killall ntpd
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

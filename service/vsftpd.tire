@@ -4,17 +4,19 @@
 NAME="vsftpd"
 
 main () {
-    case "$1" in
-    -start) vsftpd &;;
-    -stop) killall vsftpd;;
-    -restart) 
-	killall vsftpd
-	sleep 1
-	vsftpd &;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+	case "$1" in
+		-start) vsftpd &
+		;;
+		-stop) killall vsftpd
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"

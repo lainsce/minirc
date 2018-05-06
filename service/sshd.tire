@@ -3,14 +3,19 @@
 # File for sshd
 NAME="sshd"
 
-main () {
+main(){
     case "$1" in
-    -start) /usr/bin/sshd;;
-    -stop) killall sshd;;
-    -restart) busybox setsid sh -c '"$0" stop "$@"; "$0" start "$@"' "$0" "$@";;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
+	    -start) sshd
+		;;
+	    -stop) killall sshd
+		;;
+	    -restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
     esac
 }
 

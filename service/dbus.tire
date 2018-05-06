@@ -3,25 +3,25 @@
 # File for dbus
 NAME="dbus"
 
-main () {
+main(){
     case "$1" in
-    -start) mkdir -p /run/dbus &&
-	    dbus-uuidgen --ensure &&
-	    dbus-daemon --system;;
-    -stop) killall dbus-launch
-	   killall dbus-daemon
-	   rm /run/dbus/pid;;
-    -restart) 
-	killall dbus-launch
-	killall dbus-daemon
-	rm /run/dbus/pid
-	sleep 1
-	mkdir -p /run/dbus &&
-	dbus-uuidgen --ensure &&
-	dbus-daemon --system;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	test -e /run/dbus/pid;;
+	    -start)
+			mkdir -p /run/dbus &&
+		    dbus-uuidgen --ensure &&
+		    dbus-daemon --system
+		;;
+	    -stop)
+			killall dbus-launch
+			killall dbus-daemon
+			rm /run/dbus/pid
+		;;
+	    -restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;	
+	    -poll) test -e /run/dbus/pid
+		;;
     esac
 }
 

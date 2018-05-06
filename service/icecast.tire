@@ -3,18 +3,20 @@
 # File for icecast
 NAME="icecast"
 
-main () {
-    case "$1" in
-    -start) icecast -b -c /etc/icecast.xml;;
-    -stop) killall icecast;;
-    -restart) 
-	killall icecast
-	sleep 1
-	icecast -b -c /etc/icecast.xml;;
-    -poll)
-	echo_color 3 ":: $NAME is running."
-	return 0;; # doesn't make much sense for this service
-    esac
+main(){
+	case "$1" in
+		-start) icecast -b -c /etc/icecast.xml
+		;;
+		-stop) killall icecast
+		;;
+		-restart)
+			"$0" -start
+			sleep 1
+			"$0" -stop
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
 }
 
 main "$@"
