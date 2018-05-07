@@ -73,9 +73,9 @@ on_shutdown() {
 
 	# TERM & KILL all programs
 	echo_color 3 ":: killing programs..."
-	kill -sTERM 0
+	kill -s TERM 0
 	sleep 3
-	kill -sKILL 0
+	kill -s KILL 0
 
 	# umount the API filesystem
 	echo_color 3 ":: unmounting API filesystem..."
@@ -105,9 +105,9 @@ on_reboot () {
 
 	# TERM & KILL all programs
 	echo_color 3 ":: killing programs..."
-	kill -sTERM 0
+	kill -s TERM 0
 	sleep 3
-	kill -sKILL 0
+	kill -s KILL 0
 
 	# umount the API filesystem
 	echo_color 3 ":: unmounting API filesystem..."
