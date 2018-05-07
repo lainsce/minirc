@@ -2,6 +2,8 @@
 # This file is executed on boot to initialize the system and can also be run by
 # the user to start/stop daemons.
 
+DAEMONS="$(basename -s .tire /etc/rc-car/service/*)"
+
 # Read system config
 . /etc/rccar.conf
 
