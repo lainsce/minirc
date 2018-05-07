@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# File for cgmanager
+NAME="cgmanager"
+
+main(){
+	case "$1" in
+		-start) cgmanager --daemon -s -m name=systemd # Have to fake being inside systemd. How dumb.
+		;;
+		-stop) killall cgmanager
+		;;
+		-restart)
+			"$0" -stop
+			sleep 1
+			"$0" -start
+		;;
+		-poll) pgrep -x "$NAME" > /dev/null 2>&1
+		;;
+	esac
+}
+
+main "$@"
