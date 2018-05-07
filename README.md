@@ -24,7 +24,7 @@ The variable DAEMONS is used for listing the runnable services.
 
 The variable ENABLED is used to define services that are started on boot.
 
-+ First, write a .tire file for your service that you want to enable in `/etc/rc-car/service/<daemon name>.tire` files.
++ First, write a .tire file for your service that you want to enable in `/etc/rc-car/service/<daemon name>.tire` files if there isn't one already.
 + Then, write its name in the ENABLED variable in `/etc/rccar.conf` which is sourced by rc-car on boot and while running.
 + Now you can start/stop/restart/poll the service.
 
