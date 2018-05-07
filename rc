@@ -196,7 +196,7 @@ case "$1" in
 		default_poll "$2";;
 	''|list)
 		for dmn in $DAEMONS; do
-			if default_poll all "$dmn" >/dev/null 2>&1; then
+			if default_poll "$dmn" >/dev/null 2>&1; then
 				echo_color 2 [X] "$dmn"
 			else
 				echo_color 0 [ ] "$dmn"
@@ -208,12 +208,13 @@ case "$1" in
 		echo
 		echo "Actions:"
 		echo "rc list                    shows status of all daemons (default action)"
-		echo "rc start [daemons]         starts daemons"
-		echo "rc stop [daemons]	   stops daemons"
-		echo "rc restart [daemons]       restarts daemons"
+		echo "rc poll [daemon]           polls daemons"
+		echo "rc start [daemon]          starts daemons"
+		echo "rc stop [daemon]           stops daemons"
+		echo "rc restart [daemon]        restarts daemons"
 		echo
 		echo "System Actions:"
-		echo "rc reboot	           reboots the system"
+		echo "rc reboot                  reboots the system"
 		echo "rc shutdown                shutdown the system"
 	;;
 esac
