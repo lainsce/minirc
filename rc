@@ -198,13 +198,12 @@ case "$1" in
 	;;
 	reboot) on_reboot
 	;;
-	start) default_start "$2"
-	;;
-	stop) default_stop "$2"
-	;;
-	restart) default_restart "$2"
-	;;
-	poll) default_poll "$2"
+	start|stop|poll|restart)
+		cmd="$1"
+		shift
+		for dmn in ${@:-$DAEMONS}; do
+			default_"${cmd}" "$dmn"
+		done
 	;;
 	''|list)
 		for dmn in $DAEMONS; do
