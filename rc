@@ -56,7 +56,9 @@ on_boot() {
 	hwclock --systz
 
 	echo_color 3 ":: starting daemons..."
-	default_start all
+	for dmn in $ENABLED; do
+		default_start "$dmn"
+	done
 }
 
 on_shutdown() {
