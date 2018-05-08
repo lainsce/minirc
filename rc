@@ -51,6 +51,9 @@ on_boot() {
 
 	echo_color 3 ":: running fsck on partitions..."
 	fsck -A -T -C -a
+	
+	echo_color 3 ":: setting system clock..."
+	hwclock --systz
 
 	echo_color 3 ":: starting daemons..."
 	for dmn in $ENABLED; do
@@ -71,12 +74,6 @@ on_shutdown() {
 		killall udevd
 	fi
 
-	# TERM & KILL all programs
-	echo_color 3 ":: killing programs..."
-	busybox killall5 -TERM
-	sleep 3
-	busybox killall5 -KILL
-
 	# umount the API filesystem
 	echo_color 3 ":: unmounting API filesystem..."
 	umount -r /run
@@ -86,6 +83,12 @@ on_shutdown() {
 	# mount root read-only
 	echo_color 3 ":: setting root partition read-only..."
 	mount -o remount,ro /
+	
+	# TERM & KILL all programs
+	echo_color 3 ":: killing programs..."
+	busybox killall5 -TERM
+	sleep 3
+	busybox killall5 -KILL
 
 	busybox poweroff
 }
@@ -103,12 +106,6 @@ on_reboot () {
 		killall udevd
 	fi
 
-	# TERM & KILL all programs
-	echo_color 3 ":: killing programs..."
-	busybox killall5 -TERM
-	sleep 3
-	busybox killall5 -KILL
-
 	# umount the API filesystem
 	echo_color 3 ":: unmounting API filesystem..."
 	umount -r /run
@@ -118,6 +115,12 @@ on_reboot () {
 	# mount root read-only
 	echo_color 3 ":: setting root partition read-only..."
 	mount -o remount,ro /
+	
+	# TERM & KILL all programs
+	echo_color 3 ":: killing programs..."
+	busybox killall5 -TERM
+	sleep 3
+	busybox killall5 -KILL
 
 	busybox reboot
 }
@@ -127,7 +130,7 @@ default_start() {
 	all)
 		echo_color 2 ":: starting all enabled daemons..."
 		for dmn in $ENABLED; do
-			default_poll "$dmn" || default_start "$dmn"
+			default_start "$dmn"
 		done;;
 	*)
 		echo_color 2 ":: starting $1..."
