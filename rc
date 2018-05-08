@@ -51,7 +51,7 @@ on_boot() {
 
 	echo_color 3 ":: running fsck on partitions..."
 	fsck -A -T -C -a
-	
+
 	echo_color 3 ":: setting system clock..."
 	hwclock --systz
 
@@ -83,7 +83,7 @@ on_shutdown() {
 	# mount root read-only
 	echo_color 3 ":: setting root partition read-only..."
 	mount -o remount,ro /
-	
+
 	# TERM & KILL all programs
 	echo_color 3 ":: killing programs..."
 	busybox killall5 -TERM
@@ -115,7 +115,7 @@ on_reboot () {
 	# mount root read-only
 	echo_color 3 ":: setting root partition read-only..."
 	mount -o remount,ro /
-	
+
 	# TERM & KILL all programs
 	echo_color 3 ":: killing programs..."
 	busybox killall5 -TERM
@@ -127,51 +127,58 @@ on_reboot () {
 
 default_start() {
 	case "$1" in
-	all)
-		echo_color 2 ":: starting all enabled daemons..."
-		for dmn in $ENABLED; do
-			default_start "$dmn"
-		done;;
-	*)
-		echo_color 2 ":: starting $1..."
-		/etc/rc-car/service/"$1".tire -start;;
+		all)
+			echo_color 2 ":: starting all enabled daemons..."
+			for dmn in $ENABLED; do
+				default_poll "$dmn" > /dev/null 2>&1 || default_start "$dmn"
+			done
+		;;
+		*)
+			echo_color 2 ":: starting $1..."
+			/etc/rc-car/service/"$1".tire -start
+		;;
 	esac
 }
 
 default_stop() {
 	case "$1" in
-	all)
-		echo_color 1 ":: stopping all enabled daemons..."
-		for dmn in $ENABLED; do
-			default_poll all "$dmn" && default_stop "$dmn"
-		done;;
-	*)
-		echo_color 1 ":: stopping $1..."
-		/etc/rc-car/service/"$1".tire -stop;;
+		all)
+			echo_color 1 ":: stopping all enabled daemons..."
+			for dmn in $ENABLED; do
+				default_poll "$dmn" > /dev/null 2>&1 && default_stop "$dmn"
+			done
+		;;
+		*)
+			echo_color 1 ":: stopping $1..."
+			/etc/rc-car/service/"$1".tire -stop
+		;;
 	esac
 }
 
 default_restart() {
 	case "$1" in
-	all)
-		default_stop all
-		default_start all;;
-	*)
-		echo_color 4 ":: restarting $1"
-		/etc/rc-car/service/"$1".tire -restart;;
+		all)
+			default_stop all
+			default_start all
+		;;
+		*)
+			echo_color 4 ":: restarting $1"
+			/etc/rc-car/service/"$1".tire -restart
+		;;
 	esac
 }
 
 default_poll() {
 	case "$1" in
-	all)
-		pgrep "$2" >/dev/null 2>&1;;
-	*)
-		echo_color 4 ":: polling $1..."
-		/etc/rc-car/service/"$1".tire -poll &&
-		(echo_color 2 ":: $1 is running."; return 0) ||
-		(echo_color 1 ":: $1 is not running."; return 1)
-	;;
+		all)
+			pgrep "$2" > /dev/null 2>&1
+		;;
+		*)
+			echo_color 4 ":: polling $1..."
+			/etc/rc-car/service/"$1".tire -poll &&
+			(echo_color 2 ":: $1 is running."; return 0) ||
+			(echo_color 1 ":: $1 is not running."; return 1)
+		;;
 	esac
 }
 
@@ -185,28 +192,29 @@ echo_color() {
 #===================
 # handle arguments
 case "$1" in
-	init)
-		on_boot;;
-	shutdown)
-		on_shutdown;;
-	reboot)
-		on_reboot;;
-	start)
-		default_start "$2";;
-	stop)
-		default_stop "$2";;
-	restart)
-		default_restart "$2";;
-	poll)
-		default_poll "$2";;
+	init) on_boot
+	;;
+	shutdown) on_shutdown
+	;;
+	reboot) on_reboot
+	;;
+	start) default_start "$2"
+	;;
+	stop) default_stop "$2"
+	;;
+	restart) default_restart "$2"
+	;;
+	poll) default_poll "$2"
+	;;
 	''|list)
 		for dmn in $DAEMONS; do
-			if default_poll "$dmn" >/dev/null 2>&1; then
+			if default_poll "$dmn" > /dev/null 2>&1; then
 				echo_color 2 [X] "$dmn"
 			else
 				echo_color 0 [ ] "$dmn"
 			fi
-		done;;
+		done
+	;;
 	-h|--help)
 		echo "rc-car 1.0"
 		echo "Usage: [--help] [--version] <action> [list of daemons]"
